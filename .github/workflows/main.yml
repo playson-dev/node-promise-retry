@@ -43,9 +43,12 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           node-version: ${{ matrix.node-version }}
 
+      - name: Authenticate with GitHub package registry
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NODE_AUTH_TOKEN }}" > ~/.npmrc
+
       - name: Install dependencies
         if: steps.cache-modules.outputs.cache-hit != 'true'
-        run: HUSKY_SKIP_INSTALL=true npm ci
+        run: npm install
         env:
           NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
 
