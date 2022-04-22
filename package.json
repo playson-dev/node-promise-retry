@@ -3,6 +3,7 @@
   "version": "0.0.0-develop",
   "description": "Retries a function that returns a promise, leveraging the power of the retry module.",
   "main": "index.js",
+  "types": "index",
   "scripts": {
     "test": "mocha --bail -t 10000"
   },
