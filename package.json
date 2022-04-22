@@ -1,6 +1,6 @@
 {
-  "name": "promise-retry",
-  "version": "2.0.1",
+  "name": "@playson-dev/promise-retry",
+  "version": "0.0.0-develop",
   "description": "Retries a function that returns a promise, leveraging the power of the retry module.",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/IndigoUnited/node-promise-retry.git"
+    "url": "git@github.com:playson-dev/node-promise-retry.git"
   },
   "keywords": [
     "retry",
@@ -28,8 +28,8 @@
     "sleep-promise": "^8.0.1"
   },
   "dependencies": {
-    "err-code": "^2.0.2",
-    "retry": "^0.12.0"
+    "err-code": "^3.0.1",
+    "retry": "^0.13.1"
   },
   "engines": {
     "node": ">=10"

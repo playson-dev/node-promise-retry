@@ -1,0 +1,65 @@
+name: promise-retry CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-promise-retry:
+    runs-on: ubuntu-latest
+    name: Build promise-retry
+
+    strategy:
+      matrix:
+        node-version: [16.13.1]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Checkout tag-version-action
+        uses: actions/checkout@v2
+        with:
+          repository: playson-dev/tag-version-action
+          token: ${{ secrets.PLAYSON_RND_BOT_PERSONAL_TOKEN }}
+          ref: v1.7.10
+          path: ./.github/actions/tag-version-action
+
+      - name: Extract branch name
+        id: extract-branch
+        shell: bash
+        run: echo "::set-output name=branch::$(echo ${GITHUB_REF##*/})"
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          registry-url: 'https://npm.pkg.github.com'
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        if: steps.cache-modules.outputs.cache-hit != 'true'
+        run: HUSKY_SKIP_INSTALL=true npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+
+      - name: Test
+        run: |
+          npm run test
+
+      - name: Set version
+        uses: ./.github/actions/tag-version-action
+        id: package-version
+        with:
+          npm-publish: true
+          npm-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
+          github-token: ${{ secrets.PLAYSON_RND_BOT_PERSONAL_TOKEN }}
+
+      - name: Get version
+        run: |
+          echo Git tag: ${{ steps.package-version.outputs.git-tag }}
+          echo Build version: ${{ steps.package-version.outputs.version }}
+        shell: bash
