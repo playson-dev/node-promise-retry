@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  NPM_REGISTRY: https://npm.pkg.github.com/playson-dev
+
 jobs:
   build-promise-retry:
     runs-on: ubuntu-latest
@@ -37,7 +40,7 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: ${{ env.NPM_REGISTRY }}
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
