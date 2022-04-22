@@ -33,18 +33,18 @@ function promiseRetry(fn, options) {
 
             throw errcode(new Error('Retrying'), 'EPROMISERETRY', { retried: err });
           }, number);
+        })
+        .then(resolve, function(err) {
+          if (isRetryError(err)) {
+            err = err.retried;
+
+            if (operation.retry(err || new Error())) {
+              return;
+            }
+          }
+
+          reject(err);
         });
-        // .then(resolve, function(err) {
-        //   if (isRetryError(err)) {
-        //     err = err.retried;
-        //
-        //     if (operation.retry(err || new Error())) {
-        //       return;
-        //     }
-        //   }
-        //
-        //   reject(err);
-        // });
     });
   });
 }
