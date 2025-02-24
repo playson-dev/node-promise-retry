@@ -93,5 +93,4 @@ function Retry(options) {
   };
 }
 
-// Exports
 module.exports = { promiseRetry: promiseRetry, Retry: Retry };

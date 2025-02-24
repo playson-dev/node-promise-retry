@@ -410,3 +410,5 @@ describe('Retry decorator', function () {
     }
   });
 });
+
+// patch
