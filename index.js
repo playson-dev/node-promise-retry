@@ -49,4 +49,48 @@ function promiseRetry(fn, options) {
   });
 }
 
-module.exports = promiseRetry;
+/**
+ * A method decorator that automatically retries a method call using promiseRetry.
+ *
+ * @param {Object} options - The configuration options for retrying the method.
+ * @param {number} options.retries - Number of retry attempts.
+ * @param {number} [options.minTimeout=100] - Minimum wait time (ms) between retries.
+ * @param {number} [options.maxTimeout=500] - Maximum wait time (ms) between retries.
+ * @param {Function[]} [options.errors=[Error]] - Array of Error constructors; method is retried if error is instance of one.
+ * @returns {Function} A decorator function.
+ */
+function Retry(options) {
+  return function (target, propertyKey, descriptor) {
+    var originalMethod = descriptor.value;
+    var retries = options.retries;
+    var minTimeout = options.minTimeout === undefined ? 100 : options.minTimeout;
+    var maxTimeout = options.maxTimeout === undefined ? 500 : options.maxTimeout;
+    var errors = options.errors || [Error];
+    var retryOptions = { retries: retries, minTimeout: minTimeout, maxTimeout: maxTimeout };
+
+    descriptor.value = function () {
+      var args = arguments;
+      var self = this;
+      return promiseRetry(function (retry, attempt) {
+        return Promise.resolve(originalMethod.apply(self, args))
+          .catch(function (error) {
+            var shouldRetry = errors.some(function (err) {
+              return error instanceof err;
+            });
+            if (shouldRetry) {
+              if (self.logger && typeof self.logger.warn === 'function') {
+                self.logger.warn({ error: error, attempt: attempt }, 'Retrying method ' + propertyKey);
+              }
+              retry(error);
+              throw error;
+            } else {
+              throw error;
+            }
+          });
+      }, retryOptions);
+    };
+    return descriptor;
+  };
+}
+
+module.exports = { promiseRetry: promiseRetry, Retry: Retry };
