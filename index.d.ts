@@ -24,4 +24,23 @@ type RetryableFn<ResolutionType> = ((retry: (error: any) => never, attempt: numb
  */
 declare function promiseRetry<ResolutionType>(retryableFn: RetryableFn<ResolutionType>, options?: OperationOptions): Promise<ResolutionType>;
 declare function promiseRetry<ResolutionType>(options: OperationOptions, retryableFn: RetryableFn<ResolutionType>): Promise<ResolutionType>;
-export = promiseRetry;
+
+/**
+ * Options to configure the Retry decorator.
+ */
+export interface RetryOptions {
+  retries: number;
+  minTimeout?: number;
+  maxTimeout?: number;
+  errors?: Array<new (...args: any[]) => Error>;
+}
+
+/**
+ * A method decorator that automatically retries a method call using promiseRetry.
+ *
+ * @param options The configuration options for retrying the method.
+ * @returns A method decorator that wraps the original method.
+ */
+declare function Retry(options: RetryOptions): MethodDecorator;
+
+export { promiseRetry, Retry };
