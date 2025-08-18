@@ -32,6 +32,7 @@ export interface RetryOptions {
   retries: number;
   minTimeout?: number;
   maxTimeout?: number;
+  randomize?: boolean;
   errors?: Array<new (...args: any[]) => Error>;
 }
 
